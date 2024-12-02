@@ -1,19 +1,21 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter.messagebox import showerror
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError
 import threading
+from time import sleep
 
 def main():
-    app1 = Application()
-    app1.mainloop()
+    app = Application()
+    app.mainloop()
 
 class Application(Tk):
     def __init__(self):
         super().__init__()
         self.title("YouTube Downloader")
-        self.geometry("800x400")
-        self.resizable(False, False)  # Correcting the FALSE to False
+        self.geometry("800x460")
+        self.resizable(FALSE, FALSE)
         self.configure(bg="#f5f5f5")
         self.iconbitmap(r"images/favicon.ico")
 
@@ -70,8 +72,12 @@ class InputForm(ttk.Frame):
         self.update_quality_options()
 
         # Download Button
-        self.btn = ttk.Button(self, text="Download", command=self.start_download, style="Custom.TButton")
-        self.btn.grid(row=7, column=0, columnspan=2, pady=(20, 10), sticky=EW, padx=10)
+        self.download_btn = ttk.Button(self, text="Download", command=self.start_download, style="Custom.TButton")
+        self.download_btn.grid(row=7, column=0, columnspan=2, pady=(20, 10), sticky=EW, padx=10)
+
+        # Cancel Button
+        self.cancel_btn = ttk.Button(self, text="Cancel", command=self.cancel_download, style="Custom.TButton")
+        self.cancel_btn.grid(row=8, column=0, columnspan=2, pady=(10, 10), sticky=EW, padx=10)
 
         self.progress_bar = ttk.Progressbar(self, orient="horizontal", mode="determinate", length=700)
         self.progress_bar.grid(row=5, column=0, columnspan=2, pady=(20, 10), padx=10)
@@ -90,31 +96,42 @@ class InputForm(ttk.Frame):
 
     def start_download(self):
         url = self.entry.get().strip()
-        media_type = self.media_type.get()
-        quality = self.quality.get()
-        self.lbl3.config(text="Started downloading..., please wait and don't press download button twice.")
+        if not url:
+            showerror("Error", "Please enter a valid YouTube URL.")
+            return
+        else:
+            media_type = self.media_type.get()
+            quality = self.quality.get()
+            self.lbl3.config(text="Started downloading..., please wait and do not click the download button twice.")
 
-        if url:
-            # Reset progress bar and cancel event
-            self.progress_bar["value"] = 0
-            self.cancel_event.clear()
+            if url:
+                # Reset progress bar and cancel event
+                self.progress_bar["value"] = 0
+                self.cancel_event.clear()
+                # Start download in a separate thread
+                thread = threading.Thread(target=self.download_media, args=(url, media_type, quality))
+                thread.start()
 
-            # Start download in a separate thread
-            thread = threading.Thread(target=self.download_media, args=(url, media_type, quality))
-            thread.start()
+    def cancel_download(self):
+        """Cancel the ongoing download by setting the cancel event."""
+        self.cancel_event.set()  # Signal to cancel the download
+        print("\nDownload canceled!")
+        self.lbl3.config(text="Download canceled.")
 
     def progress_hook(self, d):
-        """Update the progress bar from the download progress."""
+        """Update the progress bar and check for cancellation."""
+        if self.cancel_event.is_set():
+            raise Exception("Download canceled by user.")  # Abort download
+        
         if d['status'] == 'downloading':
             total = d.get('total_bytes') or d.get('total_bytes_estimate', 0)
             downloaded = d.get('downloaded_bytes', 0)
             if total > 0:
                 percentage = (downloaded / total) * 100
-                # Use `after` to safely update progress bar from a different thread
                 self.after(0, self.update_progress, percentage)
         elif d['status'] == 'finished':
-            self.after(0, self.update_progress, 100)  # Set to 100% when finished
-
+            self.after(0, self.update_progress, 100)
+            
     def update_progress(self, value):
         """Update the progress bar's value safely in the main thread."""
         self.progress_bar["value"] = value
@@ -150,22 +167,29 @@ class InputForm(ttk.Frame):
                     'merge_output_format': 'mp4',  # Ensures video and audio are merged into a single MP4 file
                 })
 
-            # Perform download
-            with YoutubeDL(ydl_opts) as ydl:
-                for d in ydl.extract_info(url, download=False).get('formats', []):
-                    # Handle the download process
-                    if self.cancel_event.is_set():
-                        print("Download canceled.")
-                        return  # Exit download if canceled
+            try:
+                with YoutubeDL(ydl_opts) as ydl:
                     ydl.download([url])
-
-                # Check if download was canceled
-                if self.cancel_event.is_set():
-                    print("Download canceled.")
-                    return  # Exit download if canceled
+            except Exception as e:
+                if str(e) == "Download canceled by user.":
+                    print("\nDownload was canceled by the user.")
+                    return  # Exit gracefully
+                elif str(e) == "Download completed.":
+                    print("\nDownload is completed.")
+                    return  # Exit gracefully
+                else:
+                    raise  # Re-raise other exception
+            finally:
+                if not self.cancel_event.is_set():
+                    self.after(0, self.lbl3.config, {"text": "Download complete!"})
+                else:
+                    self.after(0, self.lbl3.config, {"text": "Download canceled."})
 
         except DownloadError as e:
-            print(f"Error downloading {url}: {str(e)}")
+            showerror(
+                title="ERROR",
+                message=f"Video failed to download: {e}"
+            )
 
 if __name__ == "__main__":
     main()
