@@ -7,6 +7,7 @@ This is a simple GUI-based YouTube Downloader built using Python's Tkinter libra
 - **Download Video/Audio**: Download the video or audio from YouTube based on the user's selection.
 - **Quality Options**: Choose the desired quality for videos or audio (e.g., 1080p, 720p, 192kbps, 128kbps).
 - **Progress Bar**: Shows the download progress.
+- **Cancel Download**: Cancel the download if needed (by stopping the process in the code).
 
 ## Requirements
 
@@ -67,13 +68,19 @@ For example:
 
 ## Screenshot
 
-![alt text](images/image.png)
+<img src="images/image1.png" alt="alt text" width="400" />
+<img src="images/image2.png" alt="alt text" width="400" />
+<img src="images/image3.png" alt="alt text" width="400" />
+<img src="images/image4.png" alt="alt text" width="400" />
 
 
 ## Troubleshooting
 
 - **Error: No audio/video format found**: This might happen if the YouTube URL is invalid or the selected quality is unavailable. Double-check the URL and try a different quality setting.
 - **Download Stuck or Failed**: Ensure that FFmpeg is installed and properly configured in your system's `PATH`.
+
+## Contribution
+Feel free to fork the repository, submit issues, and contribute improvements or bug fixes through pull requests. Contributions are always welcome!
 
 ## License
 This project is open-source and available under the MIT License.
