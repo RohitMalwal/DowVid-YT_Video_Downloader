@@ -12,8 +12,8 @@ def main():
 class Application(Tk):
     def __init__(self):
         super().__init__()
-        self.title("YouTube Downloader")
-        self.geometry("800x460")
+        self.title("DowVid - YouTube Downloader")
+        self.geometry("800x470")
         self.resizable(FALSE, FALSE)
         self.configure(bg="#f5f5f5")
         self.iconbitmap(r"images/favicon.ico")
@@ -38,7 +38,7 @@ class InputForm(ttk.Frame):
         style.configure("Custom.TCombobox", font=("Helvetica", 14))
 
         # Title
-        self.lbl = ttk.Label(self, text="YouTube Downloader", font=("Helvetica", 24, "bold"), style="Custom.TLabel")
+        self.lbl = ttk.Label(self, text=" DowVid  -  YouTube Downloader ", font=("Harlow Solid Italic", 28, "bold"), style="Custom.TLabel")
         self.lbl.grid(row=0, column=0, sticky=NS, padx=10, pady=(10, 20), columnspan=2)
 
         # URL Input
