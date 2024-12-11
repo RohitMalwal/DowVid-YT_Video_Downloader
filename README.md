@@ -91,7 +91,7 @@ For example:
 Feel free to fork the repository, submit issues, and contribute improvements or bug fixes through pull requests. Contributions are always welcome!
 
 ## License
-This project is open-source and available under the MIT License.
+This project is open-source and available under the Modified MIT License.
 
 ## Author
 
