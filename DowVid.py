@@ -1,9 +1,11 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter.filedialog import askdirectory
 from tkinter.messagebox import showerror
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError
 import threading
+import os
 
 def main():
     app = Application()
@@ -71,7 +73,7 @@ class InputForm(ttk.Frame):
         self.update_quality_options()
 
         # Download Button
-        self.download_btn = ttk.Button(self, text="Download", command=self.start_download, style="Custom.TButton")
+        self.download_btn = ttk.Button(self, text="Download", command=self.askdir, style="Custom.TButton")
         self.download_btn.grid(row=7, column=0, columnspan=2, pady=(20, 10), sticky=EW, padx=10)
 
         # Cancel Button
@@ -83,6 +85,16 @@ class InputForm(ttk.Frame):
 
         # Initialize cancel event
         self.cancel_event = threading.Event()
+    def askdir(self, event=NONE):
+        """ask for download directory"""
+        self.download_dir = askdirectory(
+            title="choose the directory",
+            initialdir='/'
+        )
+        if self.download_dir:
+            self.start_download()
+        else:
+            showerror("Error", "No directory selected.")
 
     def update_quality_options(self, event=None):
         """Update quality options based on selected media type."""
@@ -94,22 +106,27 @@ class InputForm(ttk.Frame):
             self.quality.set("best")
 
     def start_download(self):
+        """initiate the download process."""
+        if not hasattr(self, 'download_dir') or not self.download_dir:
+            showerror("Error", "Please select a download directory.")
+            return
+        
         url = self.entry.get().strip()
         if not url:
             showerror("Error", "Please enter a valid YouTube URL.")
             return
-        else:
-            media_type = self.media_type.get()
-            quality = self.quality.get()
-            self.lbl3.config(text="Started downloading..., please wait until download completed.")
+        
+        media_type = self.media_type.get()
+        quality = self.quality.get()
+        self.lbl3.config(text="Started downloading..., please wait until download completed.")
 
-            if url:
-                # Reset progress bar and cancel event
-                self.progress_bar["value"] = 0
-                self.cancel_event.clear()
-                # Start download in a separate thread
-                thread = threading.Thread(target=self.download_media, args=(url, media_type, quality))
-                thread.start()
+        if url:
+            # Reset progress bar and cancel event
+            self.progress_bar["value"] = 0
+            self.cancel_event.clear()
+            # Start download in a separate thread
+            thread = threading.Thread(target=self.download_media, args=(url, media_type, quality))
+            thread.start()
 
     def cancel_download(self):
         """Cancel the ongoing download by setting the cancel event."""
@@ -140,7 +157,7 @@ class InputForm(ttk.Frame):
         try:
             # Configure options based on media type
             ydl_opts = {
-                'outtmpl': '%(title)s.%(ext)s',
+                'outtmpl': os.path.join(self.download_dir, '%(title)s.%(ext)s'),
                 'progress_hooks': [self.progress_hook],
             }
 
