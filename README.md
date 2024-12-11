@@ -1,4 +1,4 @@
-# YouTube Video/Audio Downloader
+# YouTube Audio/Video Downloader
 
 This is a simple GUI-based YouTube Downloader built using Python's Tkinter library for the interface and `yt-dlp` for downloading YouTube videos or audio.
 
