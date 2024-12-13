@@ -2,13 +2,14 @@
 
 This is a simple GUI-based YouTube Downloader built using Python's Tkinter library for the interface and `yt-dlp` for downloading YouTube videos or audio.
 
+[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/RohitMalwal/DowVid-YT_Video_Downloader/total)](https://github.com/RohitMalwal/DowVid-YT_Video_Downloader)
+[![GitHub Release](https://img.shields.io/github/v/release/RohitMalwal/DowVid-YT_Video_Downloader?display_name=release&style=flat&logoColor=green)](https://github.com/RohitMalwal/DowVid-YT_Video_Downloader)
+
 ### Disclaimer
 
 This tool is intended for educational purposes only. Use it responsibly and ensure that you comply with all applicable laws, YouTube's Terms of Service, and content creators' rights. Downloading copyrighted material without permission is illegal.
 
 By using this tool, you acknowledge that you are solely responsible for ensuring the content you download is legally available for download.
-
-
 
 ## Features
 
