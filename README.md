@@ -20,7 +20,7 @@ By using this tool, you acknowledge that you are solely responsible for ensuring
 
 ## Requirements
 
-To run this application, you'll need the following:
+To run this program, you'll need the following:
 
 - Python 3.x
 - `yt-dlp` library
